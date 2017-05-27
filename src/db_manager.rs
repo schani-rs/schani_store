@@ -5,8 +5,9 @@ extern crate r2d2_diesel;
 extern crate dotenv;
 
 use diesel::pg::PgConnection;
-use self::r2d2_diesel::ConnectionManager;
+use r2d2_diesel::ConnectionManager;
 use std::env;
+
 
 lazy_static! {
   pub static ref POOL: r2d2::Pool<ConnectionManager<PgConnection>> = create_db_pool();
