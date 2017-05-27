@@ -2,10 +2,13 @@
 extern crate diesel;
 #[macro_use]
 extern crate diesel_codegen;
+#[macro_use]
+extern crate lazy_static;
 extern crate dotenv;
 
 pub mod schema;
 pub mod models;
+pub mod db_manager;
 
 use diesel::prelude::*;
 use diesel::pg::PgConnection;

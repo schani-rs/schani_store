@@ -4,9 +4,13 @@ extern crate diesel;
 use self::schani_store::*;
 use self::schani_store::models::*;
 use self::diesel::prelude::*;
+use db_manager;
 
 fn main() {
     use schani_store::schema::tags::dsl::*;
+
+    let conn = db_manager::POOL.get();
+    assert!(conn.is_ok());
 
     let connection = establish_connection();
 
@@ -24,5 +28,7 @@ fn main() {
         println!("{}", tag.id);
         println!("{}", tag.label);
     }
+
+
 
 }
