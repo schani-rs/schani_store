@@ -84,7 +84,7 @@ pub struct ImagesTag {
 
 #[derive(Insertable)]
 #[table_name="images_tags"]
-pub struct NewImageTag {
+pub struct NewImagesTag {
     pub image_id: i32,
     pub tag_id: i32,
 }
@@ -100,7 +100,7 @@ pub struct ImagesCollection {
 
 #[derive(Insertable)]
 #[table_name="images_collections"]
-pub struct NewImageCollection {
+pub struct NewImagesCollection {
     pub image_id: i32,
     pub collection_id: i32,
 }

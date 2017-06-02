@@ -4,7 +4,7 @@ use std::error::Error;
 use diesel::prelude::*;
 use schema::raw_images::table;
 use schema::raw_images::dsl::*;
-use super::super::models::{RawImage, NewRawImage};
+use super::super::models::{RawImage, NewRawImage, Image};
 use super::super::db_manager;
 
 pub fn create(new_raw_image: &NewRawImage) -> Result<RawImage, Box<Error>> {
@@ -34,5 +34,11 @@ pub fn update(raw_image: &RawImage) -> Result<RawImage, Box<Error>> {
                                 longitude.eq(raw_image.longitude.clone()),
                                 creation.eq(raw_image.creation.clone())))
                           .get_result(conn));
+    Ok(result)
+}
+
+pub fn get_images_of_raw_image(raw_image: &RawImage) -> Result<Vec<Image>, Box<Error>> {
+    let ref conn = *try!(db_manager::POOL.get());
+    let result = try!(Image::belonging_to(raw_image).load(conn));
     Ok(result)
 }
