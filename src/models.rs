@@ -1,9 +1,4 @@
-use schema::tags;
-use schema::raw_images;
-use schema::images;
-use schema::collections;
-use schema::images_collections;
-use schema::images_tags;
+use schema::{tags, images, raw_images, collections, images_tags, images_collections};
 use diesel::pg::data_types::PgDate;
 
 #[derive(Queryable)]
@@ -70,4 +65,30 @@ pub struct Collection {
 pub struct NewCollection<'a> {
     pub name: &'a str,
     pub description: &'a str,
+}
+
+#[derive(Queryable)]
+pub struct ImageTag {
+    pub image_id: i32,
+    pub tag_id: i32,
+}
+
+#[derive(Insertable)]
+#[table_name="images_tags"]
+pub struct NewImageTag {
+    pub image_id: i32,
+    pub tag_id: i32,
+}
+
+#[derive(Queryable)]
+pub struct ImageCollection {
+    pub image_id: i32,
+    pub collection_id: i32,
+}
+
+#[derive(Insertable)]
+#[table_name="images_collections"]
+pub struct NewImageCollection {
+    pub image_id: i32,
+    pub collection_id: i32,
 }
