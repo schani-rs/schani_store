@@ -41,7 +41,7 @@ pub struct NewRawImage<'a> {
 #[has_many(images_tags)]
 pub struct Image {
     pub id: i32,
-    pub titel: String,
+    pub title: String,
     pub description: String,
     pub license: String,
     pub side_car_file: String,
