@@ -6,6 +6,7 @@ extern crate diesel_codegen;
 extern crate lazy_static;
 extern crate dotenv;
 extern crate r2d2_diesel;
+extern crate chrono;
 
 mod db_manager;
 mod schema;
