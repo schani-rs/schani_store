@@ -1,5 +1,6 @@
 CREATE TABLE images_collections (
+  id SERIAL PRIMARY KEY,
   image_id INTEGER,
   collection_id INTEGER,
-  PRIMARY KEY (image_id, collection_id)
+  UNIQUE (image_id, collection_id)
 )

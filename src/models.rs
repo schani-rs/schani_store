@@ -1,7 +1,8 @@
 use schema::{tags, images, raw_images, collections, images_tags, images_collections};
 use diesel::pg::data_types::PgDate;
 
-#[derive(Queryable)]
+#[derive(Identifiable, Queryable, Associations)]
+#[has_many(images_tags)]
 pub struct Tag {
     pub id: i32,
     pub label: String,
@@ -13,7 +14,8 @@ pub struct NewTag<'a> {
     pub label: &'a str,
 }
 
-#[derive(Queryable)]
+#[derive(Identifiable, Queryable, Associations)]
+#[has_many(images)]
 pub struct RawImage {
     pub id: i32,
     pub user_id: i32,
@@ -33,7 +35,10 @@ pub struct NewRawImage<'a> {
     pub creation: PgDate,
 }
 
-#[derive(Queryable)]
+#[derive(Identifiable, Queryable, Associations)]
+#[belongs_to(RawImage)]
+#[has_many(images_collections)]
+#[has_many(images_tags)]
 pub struct Image {
     pub id: i32,
     pub titel: String,
@@ -53,7 +58,8 @@ pub struct NewImage<'a> {
     pub raw_image_id: i32,
 }
 
-#[derive(Queryable)]
+#[derive(Identifiable, Queryable, Associations)]
+#[has_many(images_collections)]
 pub struct Collection {
     pub id: i32,
     pub name: String,
@@ -67,8 +73,11 @@ pub struct NewCollection<'a> {
     pub description: &'a str,
 }
 
-#[derive(Queryable)]
-pub struct ImageTag {
+#[derive(Identifiable, Queryable, Associations)]
+#[belongs_to(Tag)]
+#[belongs_to(Image)]
+pub struct ImagesTag {
+    pub id: i32,
     pub image_id: i32,
     pub tag_id: i32,
 }
@@ -80,8 +89,11 @@ pub struct NewImageTag {
     pub tag_id: i32,
 }
 
-#[derive(Queryable)]
-pub struct ImageCollection {
+#[derive(Identifiable, Queryable, Associations)]
+#[belongs_to(Collection)]
+#[belongs_to(Image)]
+pub struct ImagesCollection {
+    pub id: i32,
     pub image_id: i32,
     pub collection_id: i32,
 }
