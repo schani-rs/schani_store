@@ -9,7 +9,8 @@ use std::fs::DirBuilder;
 fn get_file_path(id: i32, img_type: &str) -> Result<String, Box<Error>> {
     dotenv::dotenv().ok();
     let base_path = try!(env::var("FILE_STORAGE_PATH"));
-    Ok(base_path + "/" + img_type + "/" + &id.to_string())
+    let sub_dir = id % 1000;
+    Ok(base_path + "/" + img_type + "/" + &sub_dir.to_string())
 }
 
 fn ensure_dir_exists(path: &str) -> io::Result<()> {
