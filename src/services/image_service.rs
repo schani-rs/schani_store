@@ -1,13 +1,11 @@
-extern crate diesel;
-
 use std::error::Error;
 use diesel::prelude::*;
-use schema::images;
-use schema::tags;
-use schema::images_tags;
+use schema::{images, tags, images_tags, images_collections, collections};
 use schema::images::dsl::*;
-use super::super::models::{ImagesTag, NewImagesTag, Tag, Image, NewImage};
+use super::super::models::{ImagesTag, NewImagesTag, Tag, Image, NewImage, Collection,
+                           ImagesCollection};
 use super::super::db_manager;
+use super::super::diesel;
 
 pub fn create(new_image: &NewImage) -> Result<Image, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
@@ -54,9 +52,21 @@ pub fn add_tag_to_image(image: &Image, tag: &Tag) -> Result<ImagesTag, Box<Error
     Ok(result)
 }
 
-pub fn get_tags_of_image(image: &Image) -> Result<Vec<ImagesTag>, Box<Error>> {
+pub fn get_tags_of_image(image: &Image) -> Result<Vec<Tag>, Box<Error>> {
+    use diesel::pg::expression::dsl::any;
     let ref conn = *try!(db_manager::POOL.get());
-    let image_tags = try!(ImagesTag::belonging_to(image).load(conn));
+    let image_tag_ids = ImagesTag::belonging_to(image).select(images_tags::tag_id);
+    Ok(try!(tags::table
+                .filter(tags::id.eq(any(image_tag_ids)))
+                .load::<Tag>(conn)))
+}
 
-    Ok(image_tags)
+pub fn get_collections_of_image(image: &Image) -> Result<Vec<Collection>, Box<Error>> {
+    use diesel::pg::expression::dsl::any;
+    let ref conn = *try!(db_manager::POOL.get());
+    let image_collection_ids = ImagesCollection::belonging_to(image)
+        .select(images_collections::collection_id);
+    Ok(try!(collections::table
+                .filter(collections::id.eq(any(image_collection_ids)))
+                .load::<Collection>(conn)))
 }
