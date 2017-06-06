@@ -18,9 +18,13 @@ pub fn create(new_raw_image: &NewRawImage, data: &[u8]) -> Result<RawImage, Box<
     Ok(result)
 }
 
-pub fn find(raw_image: &RawImage) -> Result<RawImage, Box<Error>> {
+pub fn find(image_id: i32) -> Result<(RawImage, Vec<u8>), Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result = try!(raw_images.find(raw_image.id).first(conn));
+    let result = try!(conn.transaction::<(RawImage, Vec<u8>), Box<Error>, _>(|| {
+        let image: RawImage = try!(raw_images.find(image_id).first(conn));
+        let data = try!(file_storage::load_raw_image(image_id));
+        Ok((image, data))
+    }));
     Ok(result)
 }
 
@@ -63,16 +67,22 @@ mod tests {
             longitude: 0.32,
             creation: PgDate(0),
         };
-        if let Err(x) = create(&raw_img, image) {
-            println!("err: {}", x);
-            panic!();
+        let img = match create(&raw_img, image) {
+            Ok(i) => i,
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
+            }
+        };
+        match find(img.id) {
+            Ok(i) => {
+                let (_, data) = i;
+                assert_eq!(image, data.as_slice())
+            }
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
+            }
         }
-        // match load_image(1) {
-        //     Ok(i) => assert_eq!(image, i.as_slice()),
-        //     Err(x) => {
-        //         println!("err: {}", x);
-        //         panic!();
-        //     }
-        // }
     }
 }
