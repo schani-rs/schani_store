@@ -89,9 +89,29 @@ pub fn get_collections_of_image(image: &Image) -> Result<Vec<Collection>, Box<Er
 #[cfg(test)]
 mod tests {
     use super::*;
+    use models::NewRawImage;
+    use super::super::raw_image_service;
+    use diesel::pg::data_types::PgDate;
 
     #[test]
     fn test_create() {
+        // create raw image
+        let image = b"Hello, wurst!";
+        let raw_img = NewRawImage {
+            user_id: 999,
+            camera: "megapixelzoom",
+            latitude: 0.22,
+            longitude: 0.32,
+            creation: PgDate(0),
+        };
+        let raw = match raw_image_service::create(&raw_img, image) {
+            Ok(i) => i,
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
+            }
+        };
+        // do the test
         let image = b"Hello, wurst image!";
         let sidecar = b"I am a sidecar file!";
         let test_img = NewImage {
@@ -99,7 +119,7 @@ mod tests {
             description: "desc of test image",
             license: "MIT",
             side_car_file: "carly",
-            raw_image_id: 1,
+            raw_image_id: raw.id,
         };
         let img = match create(&test_img, image, sidecar) {
             Ok(i) => i,
