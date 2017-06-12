@@ -1,17 +1,17 @@
 use schema::{tags, images, raw_images, collections, images_tags, images_collections};
 use diesel::pg::data_types::PgDate;
 
-#[derive(Identifiable, Queryable, Associations)]
+#[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, FromForm)]
 #[has_many(images_tags)]
 pub struct Tag {
     pub id: i32,
     pub label: String,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Deserialize, FromForm)]
 #[table_name="tags"]
-pub struct NewTag<'a> {
-    pub label: &'a str,
+pub struct NewTag {
+    pub label: String,
 }
 
 #[derive(Identifiable, Queryable, Associations)]
