@@ -4,11 +4,6 @@ use super::super::models::{Tag, NewTag};
 use std::error::Error;
 use rocket::response::status;
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
-
 #[get("/tags")]
 fn get_tags() -> Result<JSON<Vec<Tag>>, Box<Error>> {
     let result = try!(tag_service::get_all());

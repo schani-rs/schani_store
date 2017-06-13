@@ -8,33 +8,53 @@ use super::super::db_manager;
 use super::super::diesel;
 use super::file_storage;
 
-pub fn create(new_image: &NewImage, data: &[u8], sidecar: &[u8]) -> Result<Image, Box<Error>> {
+pub fn create(new_image: &NewImage) -> Result<Image, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result = try!(conn.transaction::<Image, Box<Error>, _>(|| {
-        let result: Image = try!(diesel::insert(new_image)
-                                     .into(images::table)
-                                     .get_result(conn));
-        try!(file_storage::store_image(result.id, data));
-        try!(file_storage::store_sidecar_file(result.id, sidecar));
-        Ok(result)
-    }));
+    let result: Image = try!(diesel::insert(new_image)
+                                 .into(images::table)
+                                 .get_result(conn));
     Ok(result)
 }
 
-pub fn find(image_id: i32) -> Result<(Image, Vec<u8>), Box<Error>> {
+pub fn create_image_file(image_id: i32, data: &[u8]) -> Result<Image, Box<Error>> {
+    let img = try!(find(image_id));
+    try!(file_storage::store_image(img.id, data));
+    Ok(img)
+}
+
+pub fn create_sidecar_file(image_id: i32, sidecar: &[u8]) -> Result<Image, Box<Error>> {
+    let img = try!(find(image_id));
+    try!(file_storage::store_sidecar_file(img.id, sidecar));
+    Ok(img)
+}
+
+pub fn get_all() -> Result<Vec<Image>, Box<Error>> {
+    let ref conn = *try!(db_manager::POOL.get());
+    let result = try!(images.load(conn));
+    Ok(result)
+}
+
+pub fn find(image_id: i32) -> Result<Image, Box<Error>> {
+    use schema::images::dsl::*;
+    let ref conn = *try!(db_manager::POOL.get());
+    let img: Image = try!(images.find(image_id).first(conn));
+    Ok(img)
+}
+
+pub fn find_image_file(image_id: i32) -> Result<Vec<u8>, Box<Error>> {
     use schema::images::dsl::*;
     let ref conn = *try!(db_manager::POOL.get());
     let img: Image = try!(images.find(image_id).first(conn));
     let data = try!(file_storage::load_image(img.id));
-    Ok((img, data))
+    Ok(data)
 }
 
-pub fn find_sidecar(image_id: i32) -> Result<(Image, Vec<u8>), Box<Error>> {
+pub fn find_sidecar_file(image_id: i32) -> Result<Vec<u8>, Box<Error>> {
     use schema::images::dsl::*;
     let ref conn = *try!(db_manager::POOL.get());
     let img: Image = try!(images.find(image_id).first(conn));
     let data = try!(file_storage::load_sidecar_file(img.id));
-    Ok((img, data))
+    Ok(data)
 }
 
 pub fn find_range(size: i64, offset: i64) -> Result<Vec<Image>, Box<Error>> {
@@ -115,13 +135,27 @@ mod tests {
         let image = b"Hello, wurst image!";
         let sidecar = b"I am a sidecar file!";
         let test_img = NewImage {
-            title: "test image",
-            description: "desc of test image",
-            license: "MIT",
-            side_car_file: "carly",
+            title: "test image".to_string(),
+            description: "desc of test image".to_string(),
+            license: "MIT".to_string(),
+            side_car_file: "carly".to_string(),
             raw_image_id: raw.id,
         };
-        let img = match create(&test_img, image, sidecar) {
+        let img = match create(&test_img) {
+            Ok(i) => i,
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
+            }
+        };
+        let img = match create_image_file(img.id, image) {
+            Ok(i) => i,
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
+            }
+        };
+        let img = match create_sidecar_file(img.id, sidecar) {
             Ok(i) => i,
             Err(x) => {
                 println!("err: {}", x);
@@ -129,20 +163,21 @@ mod tests {
             }
         };
         match find(img.id) {
-            Ok(i) => {
-                let (_, data) = i;
-                assert_eq!(image, data.as_slice())
-            }
+            Ok(i) => assert_eq!(img.id, i.id),
             Err(x) => {
                 println!("err: {}", x);
                 panic!();
             }
         };
-        match find_sidecar(img.id) {
-            Ok(i) => {
-                let (_, data) = i;
-                assert_eq!(sidecar, data.as_slice())
+        match find_image_file(img.id) {
+            Ok(s) => assert_eq!(image, s.as_slice()),
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
             }
+        }
+        match find_sidecar_file(img.id) {
+            Ok(s) => assert_eq!(sidecar, s.as_slice()),
             Err(x) => {
                 println!("err: {}", x);
                 panic!();

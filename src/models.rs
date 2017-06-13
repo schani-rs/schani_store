@@ -35,7 +35,7 @@ pub struct NewRawImage<'a> {
     pub creation: PgDate,
 }
 
-#[derive(Identifiable, Queryable, Associations)]
+#[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, FromForm)]
 #[belongs_to(RawImage)]
 #[has_many(images_collections)]
 #[has_many(images_tags)]
@@ -48,13 +48,13 @@ pub struct Image {
     pub raw_image_id: i32,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Deserialize, FromForm)]
 #[table_name="images"]
-pub struct NewImage<'a> {
-    pub title: &'a str,
-    pub description: &'a str,
-    pub license: &'a str,
-    pub side_car_file: &'a str,
+pub struct NewImage {
+    pub title: String,
+    pub description: String,
+    pub license: String,
+    pub side_car_file: String,
     pub raw_image_id: i32,
 }
 

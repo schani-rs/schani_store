@@ -47,7 +47,7 @@ mod tests {
     #[test]
     fn test_create_and_find() {
         // create new tag
-        let new_tag = NewTag { label: "test_tag" };
+        let new_tag = NewTag { label: "test_tag".to_string() };
         let tag = match create(&new_tag) {
             Ok(i) => i,
             Err(x) => {
