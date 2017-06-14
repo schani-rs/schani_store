@@ -6,6 +6,8 @@ use rocket::response::status;
 use rocket::data::Data;
 use std::io;
 use std::io::prelude::*;
+use std::fs::File;
+use rocket::response::Stream;
 
 #[get("/raw_images")]
 fn get_raw_images() -> Result<JSON<Vec<RawImage>>, Box<Error>> {
@@ -17,6 +19,14 @@ fn get_raw_images() -> Result<JSON<Vec<RawImage>>, Box<Error>> {
 fn get_raw_image(id: i32) -> Option<JSON<RawImage>> {
     match raw_image_service::find(id) {
         Ok(t) => Some(JSON(t)),
+        Err(_) => None,
+    }
+}
+
+#[get("/raw_images/<id>/file")]
+fn get_raw_image_file(id: i32) -> Option<Stream<File>> {
+    match raw_image_service::find_raw_image_file(id) {
+        Ok(sf) => Some(Stream::from(sf)),
         Err(_) => None,
     }
 }

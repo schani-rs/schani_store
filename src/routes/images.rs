@@ -8,7 +8,6 @@ use std::io;
 use std::io::prelude::*;
 use std::fs::File;
 use rocket::response::Stream;
-use std::os::unix::net::UnixStream;
 
 #[get("/images")]
 fn get_images() -> Result<JSON<Vec<Image>>, Box<Error>> {
@@ -51,6 +50,14 @@ fn new_sidecar_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>,
 #[get("/images/<id>/sidecar")]
 fn get_sidecar_file(id: i32) -> Option<Stream<File>> {
     match image_service::find_sidecar_file(id) {
+        Ok(sf) => Some(Stream::from(sf)),
+        Err(_) => None,
+    }
+}
+
+#[get("/images/<id>/file")]
+fn get_image_file(id: i32) -> Option<Stream<File>> {
+    match image_service::find_image_file(id) {
         Ok(sf) => Some(Stream::from(sf)),
         Err(_) => None,
     }
