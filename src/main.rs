@@ -4,7 +4,7 @@ extern crate diesel;
 extern crate schani_store;
 extern crate rocket;
 
-use self::schani_store::routes::{tags, images};
+use self::schani_store::routes::{tags, images, raw_images, collections};
 
 fn main() {
     rocket::ignite()
@@ -18,6 +18,15 @@ fn main() {
                        images::get_images,
                        images::get_image,
                        images::new_image_file,
-                       images::new_sidecar_file])
+                       images::new_sidecar_file,
+                       raw_images::get_raw_images,
+                       raw_images::get_raw_image,
+                       raw_images::new,
+                       raw_images::new_raw_image_file,
+                       raw_images::update,
+                       collections::new,
+                       collections::update,
+                       collections::get_collections,
+                       collections::get_collection])
         .launch();
 }

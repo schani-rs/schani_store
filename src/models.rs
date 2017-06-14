@@ -57,7 +57,7 @@ pub struct NewImage {
     pub raw_image_id: i32,
 }
 
-#[derive(Identifiable, Queryable, Associations)]
+#[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, FromForm)]
 #[has_many(images_collections)]
 pub struct Collection {
     pub id: i32,
@@ -65,11 +65,11 @@ pub struct Collection {
     pub description: String,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Deserialize, FromForm)]
 #[table_name="collections"]
-pub struct NewCollection<'a> {
-    pub name: &'a str,
-    pub description: &'a str,
+pub struct NewCollection {
+    pub name: String,
+    pub description: String,
 }
 
 #[derive(Identifiable, Queryable, Associations)]

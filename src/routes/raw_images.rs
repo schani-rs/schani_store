@@ -14,7 +14,7 @@ fn get_raw_images() -> Result<JSON<Vec<RawImage>>, Box<Error>> {
 }
 
 #[get("/raw_images/<id>")]
-fn get_image(id: i32) -> Option<JSON<RawImage>> {
+fn get_raw_image(id: i32) -> Option<JSON<RawImage>> {
     match raw_image_service::find(id) {
         Ok(t) => Some(JSON(t)),
         Err(_) => None,

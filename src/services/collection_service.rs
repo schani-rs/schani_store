@@ -16,6 +16,12 @@ pub fn create(new_collection: &NewCollection) -> Result<Collection, Box<Error>> 
     Ok(result)
 }
 
+pub fn get_all() -> Result<Vec<Collection>, Box<Error>> {
+    let ref conn = *try!(db_manager::POOL.get());
+    let result = try!(collections.load(conn));
+    Ok(result)
+}
+
 pub fn find(collection_id: i32) -> Result<Collection, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
     let result = try!(collections.find(collection_id).first(conn));
