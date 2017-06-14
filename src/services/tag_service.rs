@@ -13,9 +13,15 @@ pub fn create(new_tag: &NewTag) -> Result<Tag, Box<Error>> {
     Ok(result)
 }
 
-pub fn find(tag: &Tag) -> Result<Tag, Box<Error>> {
+pub fn get_all() -> Result<Vec<Tag>, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result = try!(tags.find(tag.id).first(conn));
+    let result = try!(tags.load(conn));
+    Ok(result)
+}
+
+pub fn find(identifier: i32) -> Result<Tag, Box<Error>> {
+    let ref conn = *try!(db_manager::POOL.get());
+    let result = try!(tags.find(identifier).first(conn));
     Ok(result)
 }
 
@@ -31,4 +37,32 @@ pub fn update(tag: &Tag) -> Result<Tag, Box<Error>> {
                           .set(label.eq(tag.label.clone()))
                           .get_result(conn));
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use models::NewTag;
+
+    #[test]
+    fn test_create_and_find() {
+        // create new tag
+        let new_tag = NewTag { label: "test_tag".to_string() };
+        let tag = match create(&new_tag) {
+            Ok(i) => i,
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
+            }
+        };
+        // do the test
+        let found_tag = match find(tag.id) {
+            Ok(i) => i,
+            Err(x) => {
+                println!("err: {}", x);
+                panic!();
+            }
+        };
+        assert_eq!(tag.label, found_tag.label);
+    }
 }
