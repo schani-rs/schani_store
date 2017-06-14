@@ -8,6 +8,7 @@ use schema::raw_images;
 use super::super::models::{RawImage, NewRawImage, Image};
 use super::super::db_manager;
 use super::file_storage;
+use std::fs::File;
 
 pub fn create(new_raw_image: &NewRawImage) -> Result<RawImage, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
@@ -33,7 +34,7 @@ pub fn find(raw_image_id: i32) -> Result<RawImage, Box<Error>> {
     Ok(result)
 }
 
-pub fn find_raw_image_file(raw_image_id: i32) -> Result<Vec<u8>, Box<Error>> {
+pub fn find_raw_image_file(raw_image_id: i32) -> Result<File, Box<Error>> {
     use schema::raw_images::dsl::*;
     let ref conn = *try!(db_manager::POOL.get());
     let img: RawImage = try!(raw_images.find(raw_image_id).first(conn));

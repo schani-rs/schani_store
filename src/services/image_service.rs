@@ -7,6 +7,7 @@ use super::super::models::{ImagesTag, NewImagesTag, Tag, Image, NewImage, Collec
 use super::super::db_manager;
 use super::super::diesel;
 use super::file_storage;
+use std::fs::File;
 
 pub fn create(new_image: &NewImage) -> Result<Image, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
@@ -41,7 +42,7 @@ pub fn find(image_id: i32) -> Result<Image, Box<Error>> {
     Ok(img)
 }
 
-pub fn find_image_file(image_id: i32) -> Result<Vec<u8>, Box<Error>> {
+pub fn find_image_file(image_id: i32) -> Result<File, Box<Error>> {
     use schema::images::dsl::*;
     let ref conn = *try!(db_manager::POOL.get());
     let img: Image = try!(images.find(image_id).first(conn));
@@ -49,7 +50,7 @@ pub fn find_image_file(image_id: i32) -> Result<Vec<u8>, Box<Error>> {
     Ok(data)
 }
 
-pub fn find_sidecar_file(image_id: i32) -> Result<Vec<u8>, Box<Error>> {
+pub fn find_sidecar_file(image_id: i32) -> Result<File, Box<Error>> {
     use schema::images::dsl::*;
     let ref conn = *try!(db_manager::POOL.get());
     let img: Image = try!(images.find(image_id).first(conn));
@@ -169,19 +170,18 @@ mod tests {
             }
         };
         match find_image_file(img.id) {
-            Ok(s) => assert_eq!(image, s.as_slice()),
+            Ok(_) => (),
             Err(x) => {
                 println!("err: {}", x);
                 panic!();
             }
-        }
+        };
         match find_sidecar_file(img.id) {
-            Ok(s) => assert_eq!(sidecar, s.as_slice()),
+            Ok(_) => (),
             Err(x) => {
                 println!("err: {}", x);
                 panic!();
             }
-        }
-
+        };
     }
 }

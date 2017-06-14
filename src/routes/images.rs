@@ -6,6 +6,7 @@ use rocket::response::status;
 use rocket::data::Data;
 use std::io;
 use std::io::prelude::*;
+use std::fs::File;
 use rocket::response::Stream;
 use std::os::unix::net::UnixStream;
 
@@ -47,13 +48,13 @@ fn new_sidecar_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>,
     Ok(status::Created(format!("/images/sidecar/{}", result.id), Some(JSON(result))))
 }
 
-// #[get("/images/<id>/sidecar")]
-// fn get_sidecar_file(id: i32) -> Option<Vec<u8>> {
-//     match image_service::find_sidecar_file(id) {
-//         Ok(sf) => Some(sf),
-//         Err(_) => None,
-//     }
-// }
+#[get("/images/<id>/sidecar")]
+fn get_sidecar_file(id: i32) -> Option<Stream<File>> {
+    match image_service::find_sidecar_file(id) {
+        Ok(sf) => Some(Stream::from(sf)),
+        Err(_) => None,
+    }
+}
 
 #[put("/images/update?<image>")]
 fn update(image: Image) -> Option<JSON<Image>> {
