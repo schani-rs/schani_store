@@ -4,7 +4,6 @@ use std::error::Error;
 use diesel::prelude::*;
 use schema::raw_images::table;
 use schema::raw_images::dsl::*;
-use schema::raw_images;
 use super::super::models::{RawImage, NewRawImage, Image};
 use super::super::db_manager;
 use super::file_storage;

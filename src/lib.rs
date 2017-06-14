@@ -12,7 +12,6 @@ extern crate lazy_static;
 extern crate dotenv;
 extern crate r2d2_diesel;
 extern crate rocket;
-#[macro_use]
 extern crate rocket_contrib;
 
 mod db_manager;

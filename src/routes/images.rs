@@ -4,7 +4,6 @@ use super::super::models::{Image, NewImage};
 use std::error::Error;
 use rocket::response::status;
 use rocket::data::Data;
-use std::io;
 use std::io::prelude::*;
 use std::fs::File;
 use rocket::response::Stream;
