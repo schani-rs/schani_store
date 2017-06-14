@@ -113,6 +113,9 @@ mod tests {
     use models::NewRawImage;
     use super::super::raw_image_service;
     use diesel::pg::data_types::PgDate;
+    use std::fs::File;
+    use std::io;
+    use std::io::prelude::*;
 
     #[test]
     fn test_create() {
@@ -177,7 +180,18 @@ mod tests {
             }
         };
         match find_sidecar_file(img.id) {
-            Ok(_) => (),
+            Ok(sf) => {
+                let mut test = sf;
+                let mut bytes = vec![];
+                match test.read_to_end(&mut bytes) {
+                    Ok(b) => b,
+                    Err(x) => {
+                        println!("err: {}", x);
+                        panic!();
+                    }
+                };
+                assert_eq!(sidecar, bytes.as_slice())
+            }
             Err(x) => {
                 println!("err: {}", x);
                 panic!();
