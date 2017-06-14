@@ -55,7 +55,7 @@ fn new_sidecar_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>,
 //     }
 // }
 
-#[put("/tags/update?<image>")]
+#[put("/images/update?<image>")]
 fn update(image: Image) -> Option<JSON<Image>> {
     match image_service::update(&image) {
         Ok(t) => Some(JSON(t)),

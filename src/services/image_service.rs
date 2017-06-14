@@ -119,12 +119,11 @@ mod tests {
         let image = b"Hello, wurst!";
         let raw_img = NewRawImage {
             user_id: 999,
-            camera: "megapixelzoom",
+            camera: "megapixelzoom".to_string(),
             latitude: 0.22,
             longitude: 0.32,
-            creation: PgDate(0),
         };
-        let raw = match raw_image_service::create(&raw_img, image) {
+        let raw = match raw_image_service::create(&raw_img) {
             Ok(i) => i,
             Err(x) => {
                 println!("err: {}", x);

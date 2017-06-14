@@ -16,9 +16,9 @@ pub fn create(new_collection: &NewCollection) -> Result<Collection, Box<Error>> 
     Ok(result)
 }
 
-pub fn find(collection: &Collection) -> Result<Collection, Box<Error>> {
+pub fn find(collection_id: i32) -> Result<Collection, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result = try!(collections.find(collection.id).first(conn));
+    let result = try!(collections.find(collection_id).first(conn));
     Ok(result)
 }
 
