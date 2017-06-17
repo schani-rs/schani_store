@@ -2,6 +2,7 @@ use super::super::services::raw_image_service;
 use super::super::rocket_contrib::JSON;
 use super::super::models::{RawImage, NewRawImage};
 use std::error::Error;
+use rocket::request::Form;
 use rocket::response::status;
 use rocket::data::Data;
 use std::io::prelude::*;
@@ -30,19 +31,21 @@ fn get_raw_image_file(id: i32) -> Option<Stream<File>> {
     }
 }
 
-#[post("/raw_images/new?<new_raw_image>")]
-fn new(new_raw_image: NewRawImage) -> Option<status::Created<JSON<RawImage>>> {
+#[post("/raw_images", data="<image_data>")]
+fn new(image_data: Form<NewRawImage>) -> Option<status::Created<JSON<RawImage>>> {
+    let new_raw_image = image_data.get();
     match raw_image_service::create(&new_raw_image) {
-        Ok(result) => Some(status::Created(format!("/images/{}", result.id), Some(JSON(result)))),
+        Ok(result) => Some(status::Created(format!("/raw_images/{}", result.id), Some(JSON(result)))),
         Err(_) => None,
     }
 }
 
-#[post("/raw_images/<id>/file/new", format="text/plain", data="<data>")]
+#[post("/raw_images/<id>", data="<data>")]
 fn new_raw_image_file(id: i32, data: Data) -> Result<status::Created<JSON<RawImage>>, Box<Error>> {
     let mut stream = data.open();
-    let buff = try!(stream.fill_buf());
-    let result = try!(raw_image_service::create_raw_image_file(id, buff));
+    let mut buff = vec![];
+    try!(stream.read_to_end(&mut buff));
+    let result = try!(raw_image_service::create_raw_image_file(id, buff.as_slice()));
     Ok(status::Created(format!("/raw_images/{}", result.id), Some(JSON(result))))
 }
 
