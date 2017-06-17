@@ -33,16 +33,18 @@ fn new(new_image: NewImage) -> Option<status::Created<JSON<Image>>> {
 #[post("/images/<id>/file/new", data="<data>")]
 fn new_image_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>, Box<Error>> {
     let mut stream = data.open();
-    let buff = try!(stream.fill_buf());
-    let result = try!(image_service::create_image_file(id, buff));
+    let mut buff = vec![];
+    try!(stream.read_to_end(&mut buff));
+    let result = try!(image_service::create_image_file(id, buff.as_slice()));
     Ok(status::Created(format!("/images/file/{}", result.id), Some(JSON(result))))
 }
 
 #[post("/images/<id>/sidecar/new", data="<data>")]
 fn new_sidecar_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>, Box<Error>> {
     let mut stream = data.open();
-    let buff = try!(stream.fill_buf());
-    let result = try!(image_service::create_sidecar_file(id, buff));
+    let mut buff = vec![];
+    try!(stream.read_to_end(&mut buff));
+    let result = try!(image_service::create_sidecar_file(id, buff.as_slice()));
     Ok(status::Created(format!("/images/sidecar/{}", result.id), Some(JSON(result))))
 }
 
