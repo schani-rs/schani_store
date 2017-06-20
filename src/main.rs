@@ -21,6 +21,7 @@ fn main() {
                        images::new_sidecar_file,
                        images::get_sidecar_file,
                        images::get_image_file,
+                       images::get_tags_of_image,
                        raw_images::get_raw_images,
                        raw_images::get_raw_image,
                        raw_images::new,
