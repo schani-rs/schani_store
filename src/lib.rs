@@ -10,6 +10,8 @@ extern crate diesel_codegen;
 #[macro_use]
 extern crate lazy_static;
 extern crate dotenv;
+#[macro_use]
+extern crate log;
 extern crate r2d2_diesel;
 extern crate rocket;
 extern crate rocket_contrib;
