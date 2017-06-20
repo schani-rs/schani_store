@@ -14,12 +14,15 @@ pub fn create(new_image: &NewImage) -> Result<Image, Box<Error>> {
     let result: Image = try!(diesel::insert(new_image)
                                  .into(images::table)
                                  .get_result(conn));
+    info!("stored new image with id {}", result.id);
     Ok(result)
 }
 
 pub fn create_image_file(image_id: i32, data: &[u8]) -> Result<Image, Box<Error>> {
     let img = try!(find(image_id));
+    info!("storing image content for image {} …", image_id);
     try!(file_storage::store_image(img.id, data));
+    info!("data stored.");
     Ok(img)
 }
 

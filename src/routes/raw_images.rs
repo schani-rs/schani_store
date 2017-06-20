@@ -35,7 +35,9 @@ fn get_raw_image_file(id: i32) -> Option<Stream<File>> {
 fn new(image_data: Form<NewRawImage>) -> Option<status::Created<JSON<RawImage>>> {
     let new_raw_image = image_data.get();
     match raw_image_service::create(&new_raw_image) {
-        Ok(result) => Some(status::Created(format!("/raw_images/{}", result.id), Some(JSON(result)))),
+        Ok(result) => {
+            Some(status::Created(format!("/raw_images/{}", result.id), Some(JSON(result))))
+        }
         Err(_) => None,
     }
 }
