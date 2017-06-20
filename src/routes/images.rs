@@ -2,6 +2,7 @@ use super::super::services::image_service;
 use super::super::rocket_contrib::JSON;
 use super::super::models::{Image, NewImage};
 use std::error::Error;
+use rocket::request::Form;
 use rocket::response::status;
 use rocket::data::Data;
 use std::io::prelude::*;
@@ -22,19 +23,21 @@ fn get_image(id: i32) -> Option<JSON<Image>> {
     }
 }
 
-#[post("/images/new?<new_image>")]
-fn new(new_image: NewImage) -> Option<status::Created<JSON<Image>>> {
+#[post("/images", data="<new_image_data>")]
+fn new(new_image_data: Form<NewImage>) -> Option<status::Created<JSON<Image>>> {
+    let new_image = new_image_data.get();
     match image_service::create(&new_image) {
         Ok(result) => Some(status::Created(format!("/images/{}", result.id), Some(JSON(result)))),
         Err(_) => None,
     }
 }
 
-#[post("/images/<id>/file/new", data="<data>")]
+#[post("/images/<id>/file", data="<data>")]
 fn new_image_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>, Box<Error>> {
     let mut stream = data.open();
     let mut buff = vec![];
     try!(stream.read_to_end(&mut buff));
+    info!("got new image ({} bytes)", buff.len());
     let result = try!(image_service::create_image_file(id, buff.as_slice()));
     Ok(status::Created(format!("/images/file/{}", result.id), Some(JSON(result))))
 }
