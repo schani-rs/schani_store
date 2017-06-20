@@ -88,10 +88,11 @@ pub fn add_tag_to_image(image: &Image, tag: &Tag) -> Result<ImagesTag, Box<Error
     Ok(result)
 }
 
-pub fn get_tags_of_image(image: &Image) -> Result<Vec<Tag>, Box<Error>> {
+pub fn get_tags_of_image(image_id: i32) -> Result<Vec<Tag>, Box<Error>> {
     use diesel::pg::expression::dsl::any;
     let ref conn = *try!(db_manager::POOL.get());
-    let image_tag_ids = ImagesTag::belonging_to(image).select(images_tags::tag_id);
+    let image = try!(find(image_id));
+    let image_tag_ids = ImagesTag::belonging_to(&image).select(images_tags::tag_id);
     Ok(try!(tags::table
                 .filter(tags::id.eq(any(image_tag_ids)))
                 .load::<Tag>(conn)))
