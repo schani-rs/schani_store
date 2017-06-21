@@ -1,6 +1,6 @@
 use super::super::services::image_service;
 use super::super::rocket_contrib::JSON;
-use super::super::models::{Image, NewImage};
+use super::super::models::{Image, NewImage, Tag};
 use std::error::Error;
 use rocket::request::Form;
 use rocket::response::status;
@@ -18,6 +18,14 @@ fn get_images() -> Result<JSON<Vec<Image>>, Box<Error>> {
 #[get("/images/<id>")]
 fn get_image(id: i32) -> Option<JSON<Image>> {
     match image_service::find(id) {
+        Ok(t) => Some(JSON(t)),
+        Err(_) => None,
+    }
+}
+
+#[get("/images/<id>/tags")]
+fn get_tags_of_image(id: i32) -> Option<JSON<Vec<Tag>>> {
+    match image_service::get_tags_of_image(id) {
         Ok(t) => Some(JSON(t)),
         Err(_) => None,
     }
