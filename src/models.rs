@@ -8,7 +8,7 @@ pub struct Tag {
 }
 
 #[derive(Insertable, Deserialize, FromForm)]
-#[table_name="tags"]
+#[table_name = "tags"]
 pub struct NewTag {
     pub label: String,
 }
@@ -25,7 +25,7 @@ pub struct RawImage {
 }
 
 #[derive(Insertable, Deserialize, FromForm)]
-#[table_name="raw_images"]
+#[table_name = "raw_images"]
 pub struct NewRawImage {
     pub user_id: i32,
     pub camera: String,
@@ -49,7 +49,7 @@ pub struct Image {
 }
 
 #[derive(Insertable, Deserialize, FromForm)]
-#[table_name="images"]
+#[table_name = "images"]
 pub struct NewImage {
     pub title: String,
     pub description: String,
@@ -67,7 +67,7 @@ pub struct Collection {
 }
 
 #[derive(Insertable, Deserialize, FromForm)]
-#[table_name="collections"]
+#[table_name = "collections"]
 pub struct NewCollection {
     pub name: String,
     pub description: String,
@@ -82,8 +82,8 @@ pub struct ImagesTag {
     pub tag_id: i32,
 }
 
-#[derive(Insertable)]
-#[table_name="images_tags"]
+#[derive(Insertable, Deserialize, FromForm)]
+#[table_name = "images_tags"]
 pub struct NewImagesTag {
     pub image_id: i32,
     pub tag_id: i32,
@@ -99,7 +99,7 @@ pub struct ImagesCollection {
 }
 
 #[derive(Insertable)]
-#[table_name="images_collections"]
+#[table_name = "images_collections"]
 pub struct NewImagesCollection {
     pub image_id: i32,
     pub collection_id: i32,

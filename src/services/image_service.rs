@@ -8,12 +8,13 @@ use super::super::db_manager;
 use super::super::diesel;
 use super::file_storage;
 use std::fs::File;
+use super::tag_service;
 
 pub fn create(new_image: &NewImage) -> Result<Image, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result: Image = try!(diesel::insert(new_image)
-                                 .into(images::table)
-                                 .get_result(conn));
+    let result: Image = try!(diesel::insert(new_image).into(images::table).get_result(
+        conn,
+    ));
     info!("stored new image with id {}", result.id);
     Ok(result)
 }
@@ -26,9 +27,11 @@ pub fn create_image_file(image_id: i32, data: &[u8]) -> Result<Image, Box<Error>
     try!(file_storage::store_image(img.id, data));
     info!("data stored.");
     let ref conn = *try!(db_manager::POOL.get());
-    let result: Image = try!(diesel::update(images.find(image_id))
-                                 .set(processed.eq(true))
-                                 .get_result(conn));
+    let result: Image = try!(
+        diesel::update(images.find(image_id))
+            .set(processed.eq(true))
+            .get_result(conn)
+    );
     info!("marked image {} as processed", result.id);
     Ok(img)
 }
@@ -76,25 +79,33 @@ pub fn find_range(size: i64, offset: i64) -> Result<Vec<Image>, Box<Error>> {
 
 pub fn update(image: &Image) -> Result<Image, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result = try!(diesel::update(images.find(image.id))
-                          .set((title.eq(image.title.clone()),
-                                description.eq(image.description.clone()),
-                                license.eq(image.license.clone()),
-                                side_car_file.eq(image.side_car_file.clone()),
-                                raw_image_id.eq(image.raw_image_id.clone())))
-                          .get_result(conn));
+    let result = try!(
+        diesel::update(images.find(image.id))
+            .set((
+                title.eq(image.title.clone()),
+                description.eq(image.description.clone()),
+                license.eq(image.license.clone()),
+                side_car_file.eq(image.side_car_file.clone()),
+                raw_image_id.eq(image.raw_image_id.clone()),
+            ))
+            .get_result(conn)
+    );
     Ok(result)
 }
 
-pub fn add_tag_to_image(image: &Image, tag: &Tag) -> Result<ImagesTag, Box<Error>> {
+pub fn add_tag_to_image(image_id: i32, tag_id: i32) -> Result<ImagesTag, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
+    let image = try!(find(image_id));
+    let tag = try!(find(tag_id));
     let new_image_tag = NewImagesTag {
         image_id: image.id,
         tag_id: tag.id,
     };
-    let result = try!(diesel::insert(&new_image_tag)
-                          .into(images_tags::table)
-                          .get_result(conn));
+    let result = try!(
+        diesel::insert(&new_image_tag)
+            .into(images_tags::table)
+            .get_result(conn)
+    );
     Ok(result)
 }
 
@@ -103,19 +114,23 @@ pub fn get_tags_of_image(image_id: i32) -> Result<Vec<Tag>, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
     let image = try!(find(image_id));
     let image_tag_ids = ImagesTag::belonging_to(&image).select(images_tags::tag_id);
-    Ok(try!(tags::table
-                .filter(tags::id.eq(any(image_tag_ids)))
-                .load::<Tag>(conn)))
+    Ok(try!(
+        tags::table
+            .filter(tags::id.eq(any(image_tag_ids)))
+            .load::<Tag>(conn)
+    ))
 }
 
 pub fn get_collections_of_image(image: &Image) -> Result<Vec<Collection>, Box<Error>> {
     use diesel::pg::expression::dsl::any;
     let ref conn = *try!(db_manager::POOL.get());
-    let image_collection_ids = ImagesCollection::belonging_to(image)
-        .select(images_collections::collection_id);
-    Ok(try!(collections::table
-                .filter(collections::id.eq(any(image_collection_ids)))
-                .load::<Collection>(conn)))
+    let image_collection_ids =
+        ImagesCollection::belonging_to(image).select(images_collections::collection_id);
+    Ok(try!(
+        collections::table
+            .filter(collections::id.eq(any(image_collection_ids)))
+            .load::<Collection>(conn)
+    ))
 }
 
 #[cfg(test)]
