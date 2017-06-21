@@ -19,10 +19,17 @@ pub fn create(new_image: &NewImage) -> Result<Image, Box<Error>> {
 }
 
 pub fn create_image_file(image_id: i32, data: &[u8]) -> Result<Image, Box<Error>> {
+    use schema::images::dsl::*;
+
     let img = try!(find(image_id));
     info!("storing image content for image {} …", image_id);
     try!(file_storage::store_image(img.id, data));
     info!("data stored.");
+    let ref conn = *try!(db_manager::POOL.get());
+    let result: Image = try!(diesel::update(images.find(image_id))
+                                 .set(processed.eq(true))
+                                 .get_result(conn));
+    info!("marked image {} as processed", result.id);
     Ok(img)
 }
 

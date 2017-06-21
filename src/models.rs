@@ -45,6 +45,7 @@ pub struct Image {
     pub license: String,
     pub side_car_file: String,
     pub raw_image_id: i32,
+    pub processed: bool,
 }
 
 #[derive(Insertable, Deserialize, FromForm)]
