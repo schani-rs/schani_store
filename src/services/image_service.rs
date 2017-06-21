@@ -96,7 +96,7 @@ pub fn update(image: &Image) -> Result<Image, Box<Error>> {
 pub fn add_tag_to_image(image_id: i32, tag_id: i32) -> Result<ImagesTag, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
     let image = try!(find(image_id));
-    let tag = try!(find(tag_id));
+    let tag = try!(tag_service::find(tag_id));
     let new_image_tag = NewImagesTag {
         image_id: image.id,
         tag_id: tag.id,
