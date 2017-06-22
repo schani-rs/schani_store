@@ -43,7 +43,7 @@ fn new_image_collection(image_id: i32, collection_id: i32) -> Option<status::NoC
     }
 }
 
-#[get("/images/<id>/tags")]
+#[get("/collections/<id>/images")]
 fn get_images_of_collection(id: i32) -> Option<JSON<Vec<Image>>> {
     match collection_service::get_images_of_collection(id) {
         Ok(t) => Some(JSON(t)),
