@@ -44,9 +44,9 @@ fn new(new_image_data: Form<NewImage>) -> Option<status::Created<JSON<Image>>> {
 }
 
 #[post("/images/<image_id>/tags/<tag_id>")]
-fn new_image_tag(image_id: i32, tag_id: i32) -> Option<()> {
+fn new_image_tag(image_id: i32, tag_id: i32) -> Option<status::NoContent> {
     match image_service::add_tag_to_image(image_id, tag_id) {
-        Ok(result) => Some(()),
+        Ok(result) => Some(status::NoContent),
         Err(_) => None,
     }
 }

@@ -21,13 +21,24 @@ fn get_collection(id: i32) -> Option<JSON<Collection>> {
 #[post("/collections/new?<new_collection>")]
 fn new(new_collection: NewCollection) -> Result<status::Created<JSON<Collection>>, Box<Error>> {
     let result = try!(collection_service::create(&new_collection));
-    Ok(status::Created(format!("/collections/{}", result.id), Some(JSON(result))))
+    Ok(status::Created(
+        format!("/collections/{}", result.id),
+        Some(JSON(result)),
+    ))
 }
 
 #[put("/collections/update?<collection>")]
 fn update(collection: Collection) -> Option<JSON<Collection>> {
     match collection_service::update(&collection) {
         Ok(t) => Some(JSON(t)),
+        Err(_) => None,
+    }
+}
+
+#[post("/images/<image_id>/collections/<collection_id>")]
+fn new_image_collection(image_id: i32, collection_id: i32) -> Option<status::NoContent> {
+    match collection_service::add_image_to_collection(image_id, collection_id) {
+        Ok(result) => Some(status::NoContent),
         Err(_) => None,
     }
 }
