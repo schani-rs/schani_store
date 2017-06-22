@@ -38,7 +38,7 @@ fn update(collection: Collection) -> Option<JSON<Collection>> {
 #[post("/collections/<collection_id>/images/<image_id>")]
 fn new_image_collection(image_id: i32, collection_id: i32) -> Option<status::NoContent> {
     match collection_service::add_image_to_collection(image_id, collection_id) {
-        Ok(result) => Some(status::NoContent),
+        Ok(_) => Some(status::NoContent),
         Err(_) => None,
     }
 }

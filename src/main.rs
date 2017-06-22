@@ -36,6 +36,7 @@ fn main() {
                 collections::get_collections,
                 collections::get_collection,
                 collections::new_image_collection,
+                collections::get_images_of_collection,
             ],
         )
         .launch();
