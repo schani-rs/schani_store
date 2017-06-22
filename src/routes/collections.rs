@@ -1,6 +1,6 @@
 use super::super::services::collection_service;
 use super::super::rocket_contrib::JSON;
-use super::super::models::{Collection, NewCollection};
+use super::super::models::{Collection, NewCollection, Image};
 use std::error::Error;
 use rocket::response::status;
 
@@ -39,6 +39,14 @@ fn update(collection: Collection) -> Option<JSON<Collection>> {
 fn new_image_collection(image_id: i32, collection_id: i32) -> Option<status::NoContent> {
     match collection_service::add_image_to_collection(image_id, collection_id) {
         Ok(result) => Some(status::NoContent),
+        Err(_) => None,
+    }
+}
+
+#[get("/images/<id>/tags")]
+fn get_images_of_collection(id: i32) -> Option<JSON<Vec<Image>>> {
+    match collection_service::get_images_of_collection(id) {
+        Ok(t) => Some(JSON(t)),
         Err(_) => None,
     }
 }

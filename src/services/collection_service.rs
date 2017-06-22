@@ -2,8 +2,7 @@ extern crate diesel;
 
 use std::error::Error;
 use diesel::prelude::*;
-use schema::collections;
-use schema::images_collections;
+use schema::{collections, images, images_collections};
 use schema::collections::dsl::*;
 use super::super::models::{Collection, NewCollection, Image, NewImagesCollection, ImagesCollection};
 use super::super::db_manager;
@@ -67,4 +66,17 @@ pub fn add_image_to_collection(
             .get_result(conn)
     );
     Ok(result)
+}
+
+pub fn get_images_of_collection(collection_id: i32) -> Result<Vec<Image>, Box<Error>> {
+    use diesel::pg::expression::dsl::any;
+    let ref conn = *try!(db_manager::POOL.get());
+    let collection = try!(find(collection_id));
+    let image_collection_ids =
+        ImagesCollection::belonging_to(&collection).select(images_collections::image_id);
+    Ok(try!(
+        images::table
+            .filter(images::id.eq(any(image_collection_ids)))
+            .load::<Image>(conn)
+    ))
 }
