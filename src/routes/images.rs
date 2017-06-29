@@ -64,7 +64,7 @@ fn new_image_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>, B
     ))
 }
 
-#[post("/images/<id>/sidecar/new", data = "<data>")]
+#[post("/images/<id>/sidecar", data="<data>")]
 fn new_sidecar_file(id: i32, data: Data) -> Result<status::Created<JSON<Image>>, Box<Error>> {
     let mut stream = data.open();
     let mut buff = vec![];
