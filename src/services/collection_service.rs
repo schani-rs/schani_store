@@ -2,17 +2,19 @@ extern crate diesel;
 
 use std::error::Error;
 use diesel::prelude::*;
-use schema::collections;
-use schema::images_collections;
+use schema::{collections, images, images_collections};
 use schema::collections::dsl::*;
 use super::super::models::{Collection, NewCollection, Image, NewImagesCollection, ImagesCollection};
 use super::super::db_manager;
+use super::image_service;
 
 pub fn create(new_collection: &NewCollection) -> Result<Collection, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result = try!(diesel::insert(new_collection)
-                          .into(collections::table)
-                          .get_result(conn));
+    let result = try!(
+        diesel::insert(new_collection)
+            .into(collections::table)
+            .get_result(conn)
+    );
     Ok(result)
 }
 
@@ -36,23 +38,45 @@ pub fn find_range(size: i64, offset: i64) -> Result<Vec<Collection>, Box<Error>>
 
 pub fn update(collection: &Collection) -> Result<Collection, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
-    let result = try!(diesel::update(collections.find(collection.id))
-                          .set((name.eq(collection.name.clone()),
-                                description.eq(collection.description.clone())))
-                          .get_result(conn));
+    let result = try!(
+        diesel::update(collections.find(collection.id))
+            .set((
+                name.eq(collection.name.clone()),
+                description.eq(collection.description.clone()),
+            ))
+            .get_result(conn)
+    );
     Ok(result)
 }
 
-pub fn add_image_to_collection(collection: &Collection,
-                               image: &Image)
-                               -> Result<ImagesCollection, Box<Error>> {
+pub fn add_image_to_collection(
+    image_id: i32,
+    collection_id: i32,
+) -> Result<ImagesCollection, Box<Error>> {
     let ref conn = *try!(db_manager::POOL.get());
+    let image = try!(image_service::find(image_id));
+    let collection = try!(find(collection_id));
     let new_image_collection = NewImagesCollection {
         image_id: image.id,
         collection_id: collection.id,
     };
-    let result = try!(diesel::insert(&new_image_collection)
-                          .into(images_collections::table)
-                          .get_result(conn));
+    let result = try!(
+        diesel::insert(&new_image_collection)
+            .into(images_collections::table)
+            .get_result(conn)
+    );
     Ok(result)
+}
+
+pub fn get_images_of_collection(collection_id: i32) -> Result<Vec<Image>, Box<Error>> {
+    use diesel::pg::expression::dsl::any;
+    let ref conn = *try!(db_manager::POOL.get());
+    let collection = try!(find(collection_id));
+    let image_collection_ids =
+        ImagesCollection::belonging_to(&collection).select(images_collections::image_id);
+    Ok(try!(
+        images::table
+            .filter(images::id.eq(any(image_collection_ids)))
+            .load::<Image>(conn)
+    ))
 }
