@@ -1,6 +1,10 @@
 [package]
 name = "store"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Christoph Wurst <christoph@winzerhof-wurst.at>"]
 
 [dependencies]
+aws-sdk-rust = "0.1.42"
+gotham = "0.1.2"
+hyper = "0.10"
+url = "*"
