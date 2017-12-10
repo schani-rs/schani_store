@@ -46,13 +46,12 @@ impl S3Storage {
 }
 
 impl Storage for S3Storage {
-    fn store(&self, bucket: &String, name: &String, data: &[u8]) -> u64 {
+    fn store(&self, bucket: &String, name: &String, data: &[u8]) {
         let mut put_obj = PutObjectRequest::default();
         put_obj.bucket = bucket.to_owned();
         put_obj.key = name.to_string();
         put_obj.body = Some(data);
         self.client.put_object(&put_obj, None).unwrap();
-        0
     }
 
     fn get(&self, bucket: &String, name: &String) -> Vec<u8> {
