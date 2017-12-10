@@ -16,18 +16,18 @@ impl Store<S3Storage> {
 
 impl<S: Storage> Store<S> {
     pub fn save_raw_image(&self, data: &[u8]) -> u64 {
-        self.storage.store(&"raw".to_string(), data)
+        self.storage.store(&"raw".to_string(), &"file".to_string(), data)
     }
 
     pub fn save_image(&self, data: &[u8]) -> u64 {
-        self.storage.store(&"image".to_string(), data)
+        self.storage.store(&"image".to_string(), &"file".to_string(), data)
     }
 
-    pub fn get_raw_image(&self, id: u64) -> Vec<u8> {
+    pub fn get_raw_image(&self, id: &String) -> Vec<u8> {
         self.storage.get(&"raw".to_string(), id)
     }
 
-    pub fn get_image(&self, id: u64) {
+    pub fn get_image(&self, id: &String) -> Vec<u8> {
         self.storage.get(&"image".to_string(), id)
     }
 }

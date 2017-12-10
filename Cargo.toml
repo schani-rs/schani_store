@@ -5,6 +5,7 @@ authors = ["Christoph Wurst <christoph@winzerhof-wurst.at>"]
 
 [dependencies]
 aws-sdk-rust = "0.1.42"
+dotenv = "0.10.1"
 gotham = "0.1.2"
 hyper = "0.10"
 url = "*"

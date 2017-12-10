@@ -2,6 +2,7 @@ use storage::Storage;
 
 use aws::aws::common::credentials::DefaultCredentialsProvider;
 use aws::aws::common::region::Region;
+use aws::aws::s3::bucket::CreateBucketRequest;
 use aws::aws::s3::endpoint::{Endpoint, Signature};
 use aws::aws::s3::object::{GetObjectRequest, PutObjectRequest};
 use aws::aws::s3::s3client::S3Client;
@@ -25,17 +26,33 @@ impl S3Storage {
         );
         let client = S3Client::new(provider, endpoint);
 
-        S3Storage { client: client }
+        let storage = S3Storage { client: client };
+        storage.init();
+        storage
+    }
+
+    fn init(&self) {
+        if !self.client.list_buckets().unwrap().buckets.iter().any(|ref bucket| bucket.name == "raw") {
+            let mut req = CreateBucketRequest::default();
+            req.bucket = "raw".to_string();
+            self.client.create_bucket(&req).unwrap();
+        }
+        if !self.client.list_buckets().unwrap().buckets.iter().any(|ref bucket| bucket.name == "image") {
+            let mut req = CreateBucketRequest::default();
+            req.bucket = "image".to_string();
+            self.client.create_bucket(&req).unwrap();
+        }
     }
 }
 
 impl Storage for S3Storage {
-    fn store(&self, bucket: &String, name: &String, data: &[u8]) {
+    fn store(&self, bucket: &String, name: &String, data: &[u8]) -> u64 {
         let mut put_obj = PutObjectRequest::default();
         put_obj.bucket = bucket.to_owned();
         put_obj.key = name.to_string();
         put_obj.body = Some(data);
         self.client.put_object(&put_obj, None).unwrap();
+        0
     }
 
     fn get(&self, bucket: &String, name: &String) -> Vec<u8> {
@@ -48,18 +65,19 @@ impl Storage for S3Storage {
 
 #[cfg(test)]
 mod tests {
+    use dotenv::dotenv;
+
+    use std::env;
+
     use super::*;
 
     #[test]
-    fn create_s3_storage() {
-        let _s3_storage = S3Storage::new("http://172.17.0.3:9000".parse().unwrap());
-    }
-
-    #[test]
     fn store_and_get_text() {
-        let s3_storage = S3Storage::new("http://172.17.0.3:9000".parse().unwrap());
-        s3_storage.store(&"test".to_string(), &"text.txt".to_string(), b"hello");
-        let result = s3_storage.get(&"test".to_string(), &"text.txt".to_string());
+        dotenv().unwrap();
+
+        let s3_storage = S3Storage::new("http://127.0.0.1:9100".parse().unwrap());
+        s3_storage.store(&"raw".to_string(), &"text.txt".to_string(), b"hello");
+        let result = s3_storage.get(&"raw".to_string(), &"text.txt".to_string());
         assert_eq!(b"hello", result.as_slice());
     }
 }

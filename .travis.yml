@@ -4,15 +4,23 @@ rust:
   - beta
   - nightly
 
+services:
+  - docker
+
 branches:
   only:
   - master
 
 cache: cargo
 
-script:
+before_script:
   # Copy testing env file if one exists
   - if [[ -f .env.testing ]]; then cp .env.testing .env; fi
+
+  # Start s3-compatible server
+  - docker run -d -p 9100:9000 --env-file .env minio/minio server /data
+
+script:
 
   # Build
   - cargo build --verbose
