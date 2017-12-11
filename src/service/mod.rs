@@ -84,6 +84,7 @@ mod tests {
         assert_eq!("hash".to_string(), id);
     }
 
+    /*
     #[test]
     fn test_save_get_raw_image() {
         dotenv().unwrap();
@@ -96,4 +97,5 @@ mod tests {
         assert_eq!(3, restore.len());
         assert_eq!(b"raw", restore.as_slice());
     }
+    */
 }
