@@ -69,4 +69,14 @@ mod tests {
 
         assert_eq!("hash".to_string(), id);
     }
+
+    #[test]
+    fn test_save_image() {
+        let data = b"raw";
+        let store = create_test_store();
+
+        let id = store.save_image(data);
+
+        assert_eq!("hash".to_string(), id);
+    }
 }
