@@ -9,7 +9,7 @@ impl DummyStorage {
 }
 
 impl Storage for DummyStorage {
-    fn store(&self, _bucket: &String, _name: &String, data: &[u8]) {}
+    fn store(&self, _bucket: &String, _name: &String, _data: &[u8]) {}
 
     fn get(&self, _bucket: &String, _name: &String) -> Vec<u8> {
         vec![]

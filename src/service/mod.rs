@@ -45,8 +45,6 @@ impl<S: Storage, I: IdGenerator> Store<S, I> {
 
 #[cfg(test)]
 mod tests {
-    use dotenv::dotenv;
-
     use super::*;
 
     use fileid::IdGeneratorStub;
@@ -85,6 +83,8 @@ mod tests {
     }
 
     /*
+    use dotenv::dotenv;
+
     #[test]
     fn test_save_get_raw_image() {
         dotenv().unwrap();

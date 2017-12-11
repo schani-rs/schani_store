@@ -70,7 +70,12 @@ impl Storage for S3Storage {
         let mut req = GetObjectRequest::default();
         req.bucket = bucket.to_owned();
         req.key = name.to_owned();
-        self.client.get_object(&req, None).unwrap().body_buffer
+        let resp = self.client.get_object(&req, None).unwrap();
+        if resp.is_body {
+            resp.body
+        } else {
+            resp.body_buffer
+        }
     }
 }
 
