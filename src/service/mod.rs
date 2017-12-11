@@ -45,6 +45,8 @@ impl<S: Storage, I: IdGenerator> Store<S, I> {
 
 #[cfg(test)]
 mod tests {
+    use dotenv::dotenv;
+
     use super::*;
 
     use fileid::IdGeneratorStub;
@@ -80,5 +82,18 @@ mod tests {
         let id = store.save_image(data);
 
         assert_eq!("hash".to_string(), id);
+    }
+
+    #[test]
+    fn test_save_get_raw_image() {
+        dotenv().unwrap();
+
+        let store = StoreImpl::new("http://127.0.0.1:9100".parse().unwrap());
+
+        let id = store.save_raw_image(b"raw");
+        let restore = store.get_raw_image(&id);
+
+        assert_eq!(3, restore.len());
+        assert_eq!(b"raw", restore.as_slice());
     }
 }

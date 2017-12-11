@@ -32,12 +32,24 @@ impl S3Storage {
     }
 
     fn init(&self) {
-        if !self.client.list_buckets().unwrap().buckets.iter().any(|ref bucket| bucket.name == "raw") {
+        if !self.client
+            .list_buckets()
+            .unwrap()
+            .buckets
+            .iter()
+            .any(|ref bucket| bucket.name == "raw")
+        {
             let mut req = CreateBucketRequest::default();
             req.bucket = "raw".to_string();
             self.client.create_bucket(&req).unwrap();
         }
-        if !self.client.list_buckets().unwrap().buckets.iter().any(|ref bucket| bucket.name == "image") {
+        if !self.client
+            .list_buckets()
+            .unwrap()
+            .buckets
+            .iter()
+            .any(|ref bucket| bucket.name == "image")
+        {
             let mut req = CreateBucketRequest::default();
             req.bucket = "image".to_string();
             self.client.create_bucket(&req).unwrap();
@@ -58,7 +70,7 @@ impl Storage for S3Storage {
         let mut req = GetObjectRequest::default();
         req.bucket = bucket.to_owned();
         req.key = name.to_owned();
-        self.client.get_object(&req, None).unwrap().body
+        self.client.get_object(&req, None).unwrap().body_buffer
     }
 }
 
