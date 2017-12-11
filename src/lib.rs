@@ -1,24 +1,16 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
-#![feature(custom_derive)]
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate diesel_codegen;
-#[macro_use]
-extern crate lazy_static;
+
+extern crate aws_sdk_rust as aws;
+extern crate crypto;
 extern crate dotenv;
-#[macro_use]
-extern crate log;
-extern crate r2d2_diesel;
+extern crate hyper;
 extern crate rocket;
-extern crate rocket_contrib;
+extern crate url;
 
-mod db_manager;
-mod schema;
+mod fileid;
+mod service;
+mod storage;
+mod web;
 
-pub mod models;
-pub mod services;
-pub mod routes;
+pub use web::StoreWebApp;

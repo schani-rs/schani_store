@@ -1,32 +1,24 @@
-sudo: required
 language: rust
-rust: nightly
+rust:
+  - nightly
+
+services:
+  - docker
 
 branches:
   only:
   - master
 
-services:
-  - postgresql
-
 cache: cargo
 
-install:
-  - cargo install diesel_cli || true
-  - diesel --version
-
 before_script:
-  # Prepare DB
-  - psql -c 'create database schani_store;' -U postgres
-
-script:
   # Copy testing env file if one exists
   - if [[ -f .env.testing ]]; then cp .env.testing .env; fi
 
-  # Migrate
-  - diesel migration run
-  - diesel migration redo
+  # Start s3-compatible server
+  - docker run -d -p 9100:9000 --env-file .env minio/minio server /data
 
+script:
   # Build
   - cargo build --verbose
 
