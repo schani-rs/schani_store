@@ -66,8 +66,6 @@ impl Storage for S3Storage {
 mod tests {
     use dotenv::dotenv;
 
-    use std::env;
-
     use super::*;
 
     #[test]
