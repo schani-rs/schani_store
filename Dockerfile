@@ -1,7 +1,6 @@
-FROM rust:1.22.1
+FROM rustlang/rust
 WORKDIR /usr/src/myapp
 COPY . .
-RUN rustup update nightly && rustup default nightly; 
 RUN cargo build --release
 
 FROM debian:latest
