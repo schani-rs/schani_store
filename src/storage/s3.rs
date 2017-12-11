@@ -1,6 +1,6 @@
 use storage::Storage;
 
-use aws::aws::common::credentials::DefaultCredentialsProvider;
+use aws::aws::common::credentials::DefaultCredentialsProviderSync;
 use aws::aws::common::region::Region;
 use aws::aws::s3::bucket::CreateBucketRequest;
 use aws::aws::s3::endpoint::{Endpoint, Signature};
@@ -10,12 +10,12 @@ use hyper::client::Client;
 use url::Url;
 
 pub struct S3Storage {
-    client: S3Client<DefaultCredentialsProvider, Client>,
+    client: S3Client<DefaultCredentialsProviderSync, Client>,
 }
 
 impl S3Storage {
     pub fn new(url: Url) -> Self {
-        let provider = DefaultCredentialsProvider::new(None).unwrap();
+        let provider = DefaultCredentialsProviderSync::new(None).unwrap();
         let endpoint = Endpoint::new(
             Region::EuWest1,
             Signature::V4,

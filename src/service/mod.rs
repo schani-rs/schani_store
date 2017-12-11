@@ -8,6 +8,8 @@ pub struct Store<S: Storage, I: IdGenerator> {
     id_gen: I,
 }
 
+pub type StoreImpl = Store<S3Storage, HashIdGenerator>;
+
 impl Store<S3Storage, HashIdGenerator> {
     pub fn new(url: Url) -> Self {
         Store {

@@ -1,7 +1,5 @@
 language: rust
 rust:
-  - stable
-  - beta
   - nightly
 
 services:
@@ -21,7 +19,6 @@ before_script:
   - docker run -d -p 9100:9000 --env-file .env minio/minio server /data
 
 script:
-
   # Build
   - cargo build --verbose
 
