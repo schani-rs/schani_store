@@ -24,6 +24,8 @@ impl StoreWebApp {
                 routes![
                     handlers::get_raw_image,
                     handlers::save_raw_image,
+                    handlers::get_sidecar,
+                    handlers::save_sidecar,
                     handlers::get_image,
                     handlers::save_image
                 ],

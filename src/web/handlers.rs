@@ -21,6 +21,22 @@ pub fn save_raw_image(data: Data, store: State<StoreImpl>) -> Result<String, ()>
     Ok(store.save_raw_image(buf.as_slice()))
 }
 
+#[get("/sidevar/<id>")]
+pub fn get_sidecar(id: String, store: State<StoreImpl>) -> Option<Vec<u8>> {
+    if id.len() != 128 {
+        return None;
+    }
+    Some(store.get_sidecar(&id))
+}
+
+#[post("/sidecar", data = "<data>")]
+pub fn save_sidecar(data: Data, store: State<StoreImpl>) -> Result<String, ()> {
+    let mut reader = BufReader::new(data.open());
+    let mut buf = vec![];
+    reader.read_to_end(&mut buf).unwrap();
+    Ok(store.save_sidecar(buf.as_slice()))
+}
+
 #[get("/image/<id>")]
 pub fn get_image(id: String, store: State<StoreImpl>) -> Option<Vec<u8>> {
     if id.len() != 128 {
