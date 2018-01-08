@@ -30,12 +30,20 @@ impl<S: Storage, I: IdGenerator> Store<S, I> {
         self.save_file(&"raw".to_string(), data)
     }
 
+    pub fn save_sidecar(&self, data: &[u8]) -> String {
+        self.save_file(&"sidecar".to_string(), data)
+    }
+
     pub fn save_image(&self, data: &[u8]) -> String {
         self.save_file(&"image".to_string(), data)
     }
 
     pub fn get_raw_image(&self, id: &String) -> Vec<u8> {
         self.storage.get(&"raw".to_string(), id)
+    }
+
+    pub fn get_sidecar(&self, id: &String) -> Vec<u8> {
+        self.storage.get(&"sidecar".to_string(), id)
     }
 
     pub fn get_image(&self, id: &String) -> Vec<u8> {
@@ -68,6 +76,16 @@ mod tests {
         let store = create_test_store();
 
         let id = store.save_raw_image(data);
+
+        assert_eq!("hash".to_string(), id);
+    }
+
+    #[test]
+    fn test_save_sidecar() {
+        let data = b"sidecar";
+        let store = create_test_store();
+
+        let id = store.save_sidecar(data);
 
         assert_eq!("hash".to_string(), id);
     }
