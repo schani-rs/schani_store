@@ -48,6 +48,17 @@ impl S3Storage {
             .unwrap()
             .buckets
             .iter()
+            .any(|ref bucket| bucket.name == "sidecar")
+        {
+            let mut req = CreateBucketRequest::default();
+            req.bucket = "sidecar".to_string();
+            self.client.create_bucket(&req).unwrap();
+        }
+        if !self.client
+            .list_buckets()
+            .unwrap()
+            .buckets
+            .iter()
             .any(|ref bucket| bucket.name == "image")
         {
             let mut req = CreateBucketRequest::default();
