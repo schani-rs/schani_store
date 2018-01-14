@@ -21,7 +21,7 @@ pub fn save_raw_image(data: Data, store: State<StoreImpl>) -> Result<String, ()>
     Ok(store.save_raw_image(buf.as_slice()))
 }
 
-#[get("/sidevar/<id>")]
+#[get("/sidecar/<id>")]
 pub fn get_sidecar(id: String, store: State<StoreImpl>) -> Option<Vec<u8>> {
     if id.len() != 128 {
         return None;
