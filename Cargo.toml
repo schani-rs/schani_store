@@ -6,7 +6,7 @@ authors = ["Christoph Wurst <christoph@winzerhof-wurst.at>"]
 [dependencies]
 aws-sdk-rust = "0.1.42"
 dotenv = "0.11.0"
-hyper = "0.10"
+hyper = "0.12"
 rocket = "0.3.6"
 rocket_codegen = "0.3.6"
 rust-crypto = "0.2.36"
